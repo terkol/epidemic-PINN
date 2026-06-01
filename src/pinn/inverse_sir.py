@@ -20,13 +20,13 @@ class PINN(nn.Module):
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-d = load_latest_run_data()
-x = d[0].to(device)
-y1 = d[1].to(device)
-y2 = d[2].to(device)
-y3 = d[3].to(device)
+data = load_latest_run_data()
+x = data[0].to(device)
+y1 = data[1].to(device)
+y2 = data[2].to(device)
+y3 = data[3].to(device)
 
-t = len(x)
+t_max = len(x)
 model = PINN().to(device)
 opt = torch.optim.Adam(model.parameters())
 
@@ -41,9 +41,9 @@ for i in range(10000):
     d2 = torch.autograd.grad(p2, x, torch.ones_like(p2), True)[0]
     d3 = torch.autograd.grad(p3, x, torch.ones_like(p3), True)[0]
     
-    r1 = d1 - (-t * model.beta * p1 * p2)
-    r2 = d2 - (t * model.beta * p1 * p2 - t * model.gamma * p2)
-    r3 = d3 - (t * model.gamma * p2)
+    r1 = d1 - (-t_max * model.beta * p1 * p2)
+    r2 = d2 - (t_max * model.beta * p1 * p2 - t_max * model.gamma * p2)
+    r3 = d3 - (t_max * model.gamma * p2)
     
     l2 = torch.mean(r1**2) + torch.mean(r2**2) + torch.mean(r3**2)
     
